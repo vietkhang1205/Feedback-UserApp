@@ -1,8 +1,7 @@
 import React, { useState, useEffect } from 'react'
 import Form from "../../layouts/Form";
-import { Grid, InputAdornment, makeStyles, ButtonGroup, MenuItem, Button as MuiButton } from '@material-ui/core';
-import { Input, Select, Button } from "../../controls";
-import ReplayIcon from '@material-ui/icons/Replay';
+import { Grid, InputAdornment, makeStyles, ButtonGroup, MenuItem, Button as MuiButton, TextField } from '@material-ui/core';
+import { Input, Select, Button, ListIemCustom } from "../../controls";
 import ReorderIcon from '@material-ui/icons/Reorder';
 import { createAPIEndpoint, ENDPIONTS } from "../../api";
 import Popup from '../../layouts/Popup';
@@ -68,6 +67,7 @@ export default function OrderForm(props) {
     const [orderListVisibility, setOrderListVisibility] = useState(false);
     const [notify, setNotify] = useState({ isOpen: false })
     const [devices, setDevices] = useState([]);
+    const [selectedDevice, setSelectedDevice] = useState(0);
 
     const handleChangeSelected = e => {
         const { name, value } = e.target
@@ -77,6 +77,10 @@ export default function OrderForm(props) {
         });
         loadListDeviceByLocationId(e.target.value);
     }
+
+    const handleListItemClick = (event, index) => {
+        setSelectedDevice(index);
+    };
 
     useEffect(() => {
         createAPIEndpoint(ENDPIONTS.LOCATION).fetchAll()
@@ -101,7 +105,6 @@ export default function OrderForm(props) {
                     }));
                     setDevices(devices);
                     setErrors({});
-                    console.log(devices);
                 })
                 .catch(err => console.log(err));
     }
@@ -109,7 +112,7 @@ export default function OrderForm(props) {
     const validateForm = () => {
         let temp = {};
         temp.locationId = values.locationId != 0 ? "" : "This field is required.";
-        temp.description = values.description != "none" ? "" : "This field is required.";
+        temp.description = values.description != "" ? "" : "This field is required.";
         setErrors({ ...temp });
         return Object.values(temp).every(x => x === "");
     }
@@ -121,23 +124,28 @@ export default function OrderForm(props) {
     const submitOrder = e => {
         e.preventDefault();
         if (validateForm()) {
-            if (values.locationId == '') {
-                createAPIEndpoint(ENDPIONTS.ORDER).create(values)
-                    .then(res => {
-                        resetFormControls();
-                        setNotify({ isOpen: true, message: 'New order is created.' });
-                    })
-                    .catch(err => console.log(err));
-            }
-            else {
-                createAPIEndpoint(ENDPIONTS.ORDER).update(values.locationId, values)
-                    .then(res => {
-                        setNotify({ isOpen: true, message: 'The order is updated.' });
-                    })
-                    .catch(err => console.log(err));
-            }
+            // if (values.locationId == '') {
+            //     createAPIEndpoint(ENDPIONTS.FEEDBACK).create(values)
+            //         .then(res => {
+            //             resetFormControls();
+            //             setNotify({ isOpen: true, message: 'New order is created.' });
+            //         })
+            //         .catch(err => console.log(err));
+            // }
+            // else {
+            //     createAPIEndpoint(ENDPIONTS.FEEDBACK).update(values.locationId, values)
+            //         .then(res => {
+            //             setNotify({ isOpen: true, message: 'The order is updated.' });
+            //         })
+            //         .catch(err => console.log(err));
+            // }
+            createAPIEndpoint(ENDPIONTS.FEEDBACK).create(values)
+                .then(res => {
+                    resetFormControls();
+                    setNotify({ isOpen: true, message: 'New feedback is created.' });
+                })
+                .catch(err => console.log(err));
         }
-
     }
 
     const openListOfOrders = () => {
@@ -152,8 +160,8 @@ export default function OrderForm(props) {
                         <Input
                             disabled
                             label="Feedback Number"
-                            name="orderNumber"
-                            value={values.orderNumber}
+                            name="feedbackId"
+                            value={values.feedbackId}
                             InputProps={{
                                 startAdornment: <InputAdornment
                                     className={classes.adornmentText}
@@ -171,16 +179,17 @@ export default function OrderForm(props) {
                         />
                     </Grid>
                     <Grid item xs={6}>
-                        <Input label='Description' name='description' type='text' />
+                        <Input
+                            label='Description'
+                            name='description'
+                            value={values.description}
+                            type='text'
+                            onChange={handleInputChange}
+                        />
                         <ButtonGroup className={classes.submitButtonGroup}>
                             <MuiButton
                                 size="large"
                                 type="submit">Submit</MuiButton>
-                            <MuiButton
-                                size="small"
-                                onClick={resetForm}
-                                startIcon={<ReplayIcon />}
-                            />
                         </ButtonGroup>
                         <Button
                             size="large"
@@ -196,12 +205,16 @@ export default function OrderForm(props) {
                         <List className={classes.listRoot}>
                             {
                                 devices.map((item, idx) => (
-                                    <ListItem
+                                    <ListIemCustom
                                         key={idx}
+                                        name="deviceId"
+                                        value={values.deviceId}
+                                        selected={selectedDevice === idx}
+                                        onClick={(event) => handleListItemClick(event, idx)}
                                     >
                                         <ListItemText
                                             primary={item.name} />
-                                    </ListItem>
+                                    </ListIemCustom>
                                 ))
                             }
                         </List>

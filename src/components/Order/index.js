@@ -7,9 +7,9 @@ const generateOrderNumber = () => Math.floor(100000 + Math.random() * 900000).to
 
 const getFreshModelObject = () => ({
     locationId: '',
-    locationName: '',
-    orderNumber: generateOrderNumber(),
-    description: '',
+    // deviceId: '',
+    feedbackId: generateOrderNumber(),
+    description: ''
 })
 
 

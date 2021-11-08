@@ -6,7 +6,7 @@ import DeleteOutlineTwoToneIcon from '@material-ui/icons/DeleteOutlineTwoTone';
 
 export default function OrderList(props) {
 
-    const { setOrderId, setOrderListVisibility, resetFormControls, setNotify } = props;
+    const { setFeedBackId, setOrderListVisibility, resetFormControls, setNotify } = props;
 
     const [orderList, setOrderList] = useState([]);
 
@@ -18,17 +18,17 @@ export default function OrderList(props) {
             .catch(err => console.log(err))
     }, [])
 
-    const showForUpdate = id => {
-        setOrderId(id);
-        setOrderListVisibility(false);
-    }
+    // const showForUpdate = id => {
+    //     setFeedBackId(id);
+    //     setOrderListVisibility(false);
+    // }
 
     const deleteOrder = id => {
         if (window.confirm('Are you sure to delete this feedback?')) {
             createAPIEndpoint(ENDPIONTS.FEEDBACK).delete(id)
                 .then(res => {
                     setOrderListVisibility(false);
-                    setOrderId(0);
+                    setFeedBackId(0);
                     resetFormControls();
                     setNotify({ isOpen: true, message: 'Deleted successfully.' });
                 })
@@ -42,33 +42,36 @@ export default function OrderList(props) {
                 <TableHead>
                     <TableRow>
                         <TableCell>Feedback No.</TableCell>
-                        <TableCell>Location Name</TableCell>
-                        <TableCell>Device</TableCell>
+                        <TableCell>Customer Name</TableCell>
                         <TableCell>Description</TableCell>
                         <TableCell>Status</TableCell>
+                        <TableCell>DateTime</TableCell>
                         <TableCell></TableCell>
                     </TableRow>
                 </TableHead>
                 <TableBody>
                     {
-                        orderList.map(item => (
-                            <TableRow key={item.orderMasterId}>
-                                <TableCell
-                                    onClick={e => showForUpdate(item.orderMasterId)}>
-                                    {item.feedbackId}
+                        orderList.map((item, index) => (
+                            <TableRow key={index}>
+                                <TableCell>
+                                    {index + 1}
                                 </TableCell>
-                                <TableCell
-                                    onClick={e => showForUpdate(item.orderMasterId)}>
-                                    {item.device.location.locatitonName}
+                                <TableCell>
+                                    {item.customerName}
                                 </TableCell>
-                                <TableCell
-                                    onClick={e => showForUpdate(item.orderMasterId)}>
-                                    {item.name}
+                                <TableCell>
+                                    {item.description}
+                                </TableCell>
+                                <TableCell>
+                                    {item.status}
+                                </TableCell>
+                                <TableCell>
+                                    {item.dateTime}
                                 </TableCell>
                                 <TableCell>
                                     <DeleteOutlineTwoToneIcon
                                         color="secondary"
-                                        onClick={e => deleteOrder(item.orderMasterId)} />
+                                        onClick={e => deleteOrder(item.feedbackId)} />
                                 </TableCell>
 
                             </TableRow>
