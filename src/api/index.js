@@ -15,10 +15,10 @@ export const createAPIEndpoint = endpoint => {
     return {
         fetchAll: () => axios.get(url),
         fetchById: id => axios.get(url + id),
-        fetchByUserId: id =>axios.get(url+id+'/Feedback'),
+        fetchByUserId: id => axios.get(url + id + '/Feedback'),
         create: newRecord => axios.post(url, newRecord),
         update: (id, updatedRecord) => axios.put(url + id, updatedRecord),
         delete: id => axios.delete(url + id),
-        fetchDevice: id =>axios.get(url+id+'/Devices?locationId='+id)
+        fetchListDeviceById: id => axios.get(url + id + '/Devices?locationId=' + id)
     }
 }

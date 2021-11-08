@@ -1,22 +1,14 @@
 import React, { useState, useEffect } from 'react'
 import Form from "../../layouts/Form";
-import { Grid, InputAdornment, makeStyles, ButtonGroup, Button as MuiButton } from '@material-ui/core';
+import { Grid, InputAdornment, makeStyles, ButtonGroup, MenuItem, Button as MuiButton } from '@material-ui/core';
 import { Input, Select, Button } from "../../controls";
 import ReplayIcon from '@material-ui/icons/Replay';
-import RestaurantMenuIcon from '@material-ui/icons/RestaurantMenu';
 import ReorderIcon from '@material-ui/icons/Reorder';
 import { createAPIEndpoint, ENDPIONTS } from "../../api";
-import { roundTo2DecimalPoint } from "../../utils";
 import Popup from '../../layouts/Popup';
 import OrderList from './OrderList';
 import Notification from "../../layouts/Notification";
 import { List, ListItem, ListItemText, Paper, InputBase, IconButton, ListItemSecondaryAction } from '@material-ui/core';
-
-const pMethods = [
-    { id: 'none', title: 'Select' },
-    { id: 'Cash', title: 'Cash' },
-    { id: 'Card', title: 'Card' },
-]
 
 const useStyles = makeStyles(theme => ({
     adornmentText: {
@@ -36,6 +28,34 @@ const useStyles = makeStyles(theme => ({
         '&:hover': {
             backgroundColor: '#f3b33d',
         }
+    },
+    searchPaper: {
+        padding: '2px 4px',
+        display: 'flex',
+        alignItems: 'center',
+    },
+    searchInput: {
+        marginLeft: theme.spacing(1.5),
+        flex: 1,
+    },
+    listRoot: {
+        marginTop: theme.spacing(1),
+        maxHeight: 450,
+        overflow: 'auto',
+        '& li:hover': {
+            cursor: 'pointer',
+            backgroundColor: '#E3E3E3'
+        },
+        '& li:hover .MuiButtonBase-root': {
+            display: 'block',
+            color: '#000',
+        },
+        '& .MuiButtonBase-root': {
+            display: 'none'
+        },
+        '& .MuiButtonBase-root:hover': {
+            backgroundColor: 'transparent'
+        }
     }
 }))
 
@@ -46,76 +66,62 @@ export default function OrderForm(props) {
     const classes = useStyles();
     const [locationList, setlocationList] = useState([]);
     const [orderListVisibility, setOrderListVisibility] = useState(false);
-    const [orderId, setOrderId] = useState(0);
     const [notify, setNotify] = useState({ isOpen: false })
-    const [Devices, setDevices] = useState([]);
-    const [searchList, setSearchList] = useState([]);
+    const [devices, setDevices] = useState([]);
+
+    const handleChangeSelected = e => {
+        const { name, value } = e.target
+        setValues({
+            ...values,
+            [name]: value
+        });
+        loadListDeviceByLocationId(e.target.value);
+    }
 
     useEffect(() => {
         createAPIEndpoint(ENDPIONTS.LOCATION).fetchAll()
             .then(res => {
-                let locationList = res.data.map(item => ({
+                let list = res.data.map(item => ({
                     id: item.locationId,
                     title: item.locatitonName
                 }));
-                locationList = [{ id: 0, title: 'Select' }].concat(locationList);
-                setlocationList(locationList);
+                setlocationList(list);
+                setErrors({});
             })
             .catch(err => console.log(err))
     }, [])
-    useEffect(() => {
-        createAPIEndpoint(ENDPIONTS.DEVICE).fetchDevice('VS023')
-            .then(res => {
-                setDevices(res.data);
-                setSearchList(res.data);
-            })
-            .catch(err => console.log(err))
 
-    }, [])
-
-
-
-    useEffect(() => {
-        let gTotal = values.orderDetails.reduce((tempTotal, item) => {
-            return tempTotal + (item.quantity * item.foodItemPrice);
-        }, 0);
-        setValues({
-            ...values,
-            gTotal: roundTo2DecimalPoint(gTotal)
-        })
-
-    }, [JSON.stringify(values.orderDetails)]);
-
-    useEffect(() => {
-        if (orderId == 0) resetFormControls()
-        else {
-            createAPIEndpoint(ENDPIONTS.ORDER).fetchById(orderId)
+    const loadListDeviceByLocationId = (locationId) => {
+        (locationId === '' || locationId === undefined || locationId === null) ? resetFormControls() :
+            createAPIEndpoint(ENDPIONTS.DEVICE).fetchListDeviceById(locationId)
                 .then(res => {
-                    setValues(res.data);
+                    let devices = res.data.map(item => ({
+                        id: item.deviceId,
+                        name: item.name
+                    }));
+                    setDevices(devices);
                     setErrors({});
+                    console.log(devices);
                 })
-                .catch(err => console.log(err))
-        }
-    }, [orderId]);
+                .catch(err => console.log(err));
+    }
 
     const validateForm = () => {
         let temp = {};
         temp.locationId = values.locationId != 0 ? "" : "This field is required.";
-        temp.pMethod = values.pMethod != "none" ? "" : "This field is required.";
-        temp.orderDetails = values.orderDetails.length != 0 ? "" : "This field is required.";
+        temp.description = values.description != "none" ? "" : "This field is required.";
         setErrors({ ...temp });
         return Object.values(temp).every(x => x === "");
     }
 
     const resetForm = () => {
         resetFormControls();
-        setOrderId(0);
     }
 
     const submitOrder = e => {
         e.preventDefault();
         if (validateForm()) {
-            if (values.orderMasterId == 0) {
+            if (values.locationId == '') {
                 createAPIEndpoint(ENDPIONTS.ORDER).create(values)
                     .then(res => {
                         resetFormControls();
@@ -124,9 +130,8 @@ export default function OrderForm(props) {
                     .catch(err => console.log(err));
             }
             else {
-                createAPIEndpoint(ENDPIONTS.ORDER).update(values.orderMasterId, values)
+                createAPIEndpoint(ENDPIONTS.ORDER).update(values.locationId, values)
                     .then(res => {
-                        setOrderId(0);
                         setNotify({ isOpen: true, message: 'The order is updated.' });
                     })
                     .catch(err => console.log(err));
@@ -155,42 +160,21 @@ export default function OrderForm(props) {
                                     position="start">#</InputAdornment>
                             }}
                         />
-
                         <Select
+                            placeholder="Please select location"
                             label="Location"
-                            name="locatitonName"
-                            value={values.locatitonName}
-                            onChange={handleInputChange}
+                            name="locationId"
+                            value={values.locationId}
+                            onChange={handleChangeSelected}
                             options={locationList}
                             error={errors.locatitonName}
                         />
-                        
                     </Grid>
                     <Grid item xs={6}>
-                        <Input label='Description' name='txtDescription' type='text' />
-                        {/* <Select
-                            label="Payment Method"
-                            name="pMethod"
-                            value={values.pMethod}
-                            onChange={handleInputChange}
-                            options={pMethods}
-                            error={errors.pMethod}
-                        /> */}
-                        {/* <Input
-                            disabled
-                            label="Grand Total"
-                            name="gTotal"
-                            value={values.gTotal}
-                            InputProps={{
-                                startAdornment: <InputAdornment
-                                    className={classes.adornmentText}
-                                    position="start">$</InputAdornment>
-                            }}
-                        /> */}
+                        <Input label='Description' name='description' type='text' />
                         <ButtonGroup className={classes.submitButtonGroup}>
                             <MuiButton
                                 size="large"
-                                // endIcon={<RestaurantMenuIcon />}
                                 type="submit">Submit</MuiButton>
                             <MuiButton
                                 size="small"
@@ -205,6 +189,23 @@ export default function OrderForm(props) {
                         >Feedback History</Button>
 
                     </Grid>
+                    <Grid item xs={6}>
+                        <h3>
+                            List Device
+                        </h3>
+                        <List className={classes.listRoot}>
+                            {
+                                devices.map((item, idx) => (
+                                    <ListItem
+                                        key={idx}
+                                    >
+                                        <ListItemText
+                                            primary={item.name} />
+                                    </ListItem>
+                                ))
+                            }
+                        </List>
+                    </Grid>
                 </Grid>
             </Form>
             <Popup
@@ -212,7 +213,7 @@ export default function OrderForm(props) {
                 openPopup={orderListVisibility}
                 setOpenPopup={setOrderListVisibility}>
                 <OrderList
-                    {...{ setOrderId, setOrderListVisibility, resetFormControls, setNotify }} />
+                    {...{ setOrderListVisibility, resetFormControls, setNotify }} />
             </Popup>
             <Notification
                 {...{ notify, setNotify }} />

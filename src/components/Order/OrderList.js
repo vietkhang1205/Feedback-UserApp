@@ -65,14 +65,6 @@ export default function OrderList(props) {
                                     onClick={e => showForUpdate(item.orderMasterId)}>
                                     {item.name}
                                 </TableCell>
-                                <TableCell
-                                    onClick={e => showForUpdate(item.orderMasterId)}>
-                                    {item.gTotal}
-                                </TableCell>
-                                <TableCell
-                                    onClick={e => showForUpdate(item.orderMasterId)}>
-                                    {item.gTotal}
-                                </TableCell>
                                 <TableCell>
                                     <DeleteOutlineTwoToneIcon
                                         color="secondary"
