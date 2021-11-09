@@ -71,11 +71,11 @@ export default function OrderForm(props) {
 
     const handleChangeSelected = e => {
         const { name, value } = e.target;
+        loadListDeviceByLocationId(e.target.value);
         setValues({
             ...values,
             [name]: value
         });
-        loadListDeviceByLocationId(e.target.value);
     }
 
     const handleListItemClick = (index, item) => {
@@ -84,7 +84,7 @@ export default function OrderForm(props) {
             ...values,
             deviceId: item.deviceId
         });
-    };
+    }
 
     useEffect(() => {
         createAPIEndpoint(ENDPIONTS.LOCATION).fetchAll()
@@ -103,10 +103,17 @@ export default function OrderForm(props) {
         (locationId === '' || locationId === undefined || locationId === null) ? resetFormControls() :
             createAPIEndpoint(ENDPIONTS.DEVICE).fetchListDeviceById(locationId)
                 .then(res => {
-                    let devices = res.data.map(item => ({
-                        deviceId: item.deviceId,
-                        name: item.name
-                    }));
+                    let devices = res.data.map(item => {
+                        setValues({
+                            ...values,
+                            locationId: locationId,
+                            deviceId: item.deviceId
+                        });
+                        return {
+                            deviceId: item.deviceId,
+                            name: item.name
+                        }
+                    });
                     setDevices(devices);
                     setErrors({});
                 })
