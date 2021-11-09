@@ -107,7 +107,7 @@ export default function OrderForm(props) {
                         setValues({
                             ...values,
                             locationId: locationId,
-                            deviceId: item.deviceId
+                            deviceId: res.data[0].deviceId
                         });
                         return {
                             deviceId: item.deviceId,
@@ -128,21 +128,17 @@ export default function OrderForm(props) {
         return Object.values(temp).every(x => x === "");
     }
 
-    const resetForm = () => {
-        resetFormControls();
-    }
-
     const submitOrder = e => {
         e.preventDefault();
         if (validateForm()) {
             createAPIEndpoint(ENDPIONTS.FEEDBACK).create(values)
                 .then(res => {
+                    setDevices([]);
                     resetFormControls();
                     setNotify({ isOpen: true, message: 'New feedback is created.' });
                 })
                 .catch(err => console.log(err));
         }
-        console.log(values);
     }
 
     const openListOfOrders = () => {
