@@ -1,7 +1,7 @@
 import React from 'react'
 import { ListItem } from '@material-ui/core';
 
-export default function ListIemCustom(props) {
+export default function ListItemCustom(props) {
 
     const { name, value, selected, onChange, error = null, ...other } = props;
     return (

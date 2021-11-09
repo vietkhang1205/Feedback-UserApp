@@ -1,7 +1,7 @@
 import React, { useState, useEffect } from 'react'
 import Form from "../../layouts/Form";
 import { Grid, InputAdornment, makeStyles, ButtonGroup, MenuItem, Button as MuiButton, TextField } from '@material-ui/core';
-import { Input, Select, Button, ListIemCustom } from "../../controls";
+import { Input, Select, Button, ListItemCustom, HiddenField } from "../../controls";
 import ReorderIcon from '@material-ui/icons/Reorder';
 import { createAPIEndpoint, ENDPIONTS } from "../../api";
 import Popup from '../../layouts/Popup';
@@ -70,7 +70,7 @@ export default function OrderForm(props) {
     const [selectedDevice, setSelectedDevice] = useState(0);
 
     const handleChangeSelected = e => {
-        const { name, value } = e.target
+        const { name, value } = e.target;
         setValues({
             ...values,
             [name]: value
@@ -78,8 +78,12 @@ export default function OrderForm(props) {
         loadListDeviceByLocationId(e.target.value);
     }
 
-    const handleListItemClick = (event, index) => {
+    const handleListItemClick = (index, item) => {
         setSelectedDevice(index);
+        setValues({
+            ...values,
+            deviceId: item.deviceId
+        });
     };
 
     useEffect(() => {
@@ -100,7 +104,7 @@ export default function OrderForm(props) {
             createAPIEndpoint(ENDPIONTS.DEVICE).fetchListDeviceById(locationId)
                 .then(res => {
                     let devices = res.data.map(item => ({
-                        id: item.deviceId,
+                        deviceId: item.deviceId,
                         name: item.name
                     }));
                     setDevices(devices);
@@ -124,21 +128,6 @@ export default function OrderForm(props) {
     const submitOrder = e => {
         e.preventDefault();
         if (validateForm()) {
-            // if (values.locationId == '') {
-            //     createAPIEndpoint(ENDPIONTS.FEEDBACK).create(values)
-            //         .then(res => {
-            //             resetFormControls();
-            //             setNotify({ isOpen: true, message: 'New order is created.' });
-            //         })
-            //         .catch(err => console.log(err));
-            // }
-            // else {
-            //     createAPIEndpoint(ENDPIONTS.FEEDBACK).update(values.locationId, values)
-            //         .then(res => {
-            //             setNotify({ isOpen: true, message: 'The order is updated.' });
-            //         })
-            //         .catch(err => console.log(err));
-            // }
             createAPIEndpoint(ENDPIONTS.FEEDBACK).create(values)
                 .then(res => {
                     resetFormControls();
@@ -146,6 +135,7 @@ export default function OrderForm(props) {
                 })
                 .catch(err => console.log(err));
         }
+        console.log(values);
     }
 
     const openListOfOrders = () => {
@@ -205,16 +195,16 @@ export default function OrderForm(props) {
                         <List className={classes.listRoot}>
                             {
                                 devices.map((item, idx) => (
-                                    <ListIemCustom
+                                    <ListItemCustom
                                         key={idx}
-                                        name="deviceId"
+                                        name='deviceId'
                                         value={values.deviceId}
                                         selected={selectedDevice === idx}
-                                        onClick={(event) => handleListItemClick(event, idx)}
+                                        onClick={() => handleListItemClick(idx, item)}
                                     >
                                         <ListItemText
                                             primary={item.name} />
-                                    </ListIemCustom>
+                                    </ListItemCustom>
                                 ))
                             }
                         </List>
