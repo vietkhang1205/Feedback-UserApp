@@ -1,0 +1,72 @@
+body{
+    /* background-image: url('https://scontent.fdad1-1.fna.fbcdn.net/v/t1.6435-9/240767115_4456155304423196_8228484765399941221_n.jpg?_nc_cat=109&ccb=1-5&_nc_sid=e3f864&_nc_ohc=R_mwQKwZu4gAX_HlsoI&_nc_ht=scontent.fdad1-1.fna&oh=0e06c566e71067c961e0dda8bf8b53f7&oe=61A90277%27); */
+    background-color: white;
+    height: 720px;
+    background-position: center;
+    background-repeat: no-repeat;
+    background-size: cover;
+    position: relative;
+    text-align: center;
+    color: white;
+}
+
+.login form{
+    /* background-image: url('https://scontent.fdad2-1.fna.fbcdn.net/v/t1.6435-9/213422974_1594899000844094_5291388605477678177_n.jpg?_nc_cat=101&ccb=1-5&_nc_sid=e3f864&_nc_ohc=HV3zfzcL0RwAX-_AvxR&_nc_ht=scontent.fdad2-1.fna&oh=496571b2e6477bec2a6fc46095038131&oe=61AE2BC3%27); */
+    border: 2px solid black;
+    position: absolute;
+    top: calc(40% - 100px);
+    left: calc(18% - 190px);
+    height: 300px;
+    width: 350px;
+    padding: 30px;
+    color: #000;
+    z-index: 2;
+    text-align: center;
+    text-transform: uppercase;
+    text-shadow: 2px 2px 5px red;
+    font-size: 150%;
+    background-color: azure;
+}
+
+.login input[type=text]{
+    width: 250px;
+    height: 30px;
+    background: transparent;
+    border: 2px solid black;
+    border-radius: 2px;
+    color: black;
+    font-family: 'Exo', sans-serif;
+    font-size: 16px;
+    font-weight: 400;
+    padding: 4px;
+
+}
+
+.login input[type=password]{
+    width: 250px;
+    height: 30px;
+    background: transparent;
+    border: 2px solid black;
+    border-radius: 2px;
+    color: black;
+    font-family: 'Exo', sans-serif;
+    font-size: 16px;
+    font-weight: 400;
+    padding: 4px;
+    margin-top: 10px;
+}
+
+.login input[type=button]{
+    width: 260px;
+    height: 35px;
+    background: #fff;
+    border: 1px solid #fff;
+    cursor: pointer;
+    border-radius: 2px;
+    color: #a18d6c;
+    font-family: 'Exo', sans-serif;
+    font-size: 16px;
+    font-weight: 400;
+    padding: 6px;
+    margin-top: 10px;
+}
