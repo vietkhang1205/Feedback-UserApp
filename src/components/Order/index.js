@@ -9,7 +9,8 @@ const getFreshModelObject = () => ({
     locationId: '',
     deviceId: '',
     feedbackId: generateOrderNumber(),
-    description: ''
+    description: '',
+    customerName: ''
 })
 
 

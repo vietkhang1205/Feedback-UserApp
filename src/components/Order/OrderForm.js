@@ -3,7 +3,7 @@ import Form from "../../layouts/Form";
 import { Grid, InputAdornment, makeStyles, ButtonGroup, MenuItem, Button as MuiButton, TextField } from '@material-ui/core';
 import { Input, Select, Button, ListItemCustom, HiddenField } from "../../controls";
 import ReorderIcon from '@material-ui/icons/Reorder';
-import { createAPIEndpoint, ENDPIONTS } from "../../api";
+import { createAPIEndpoint, callAPI, ENDPIONTS } from "../../api";
 import Popup from '../../layouts/Popup';
 import OrderList from './OrderList';
 import Notification from "../../layouts/Notification";
@@ -115,6 +115,7 @@ export default function OrderForm(props) {
                         }
                     });
                     setDevices(devices);
+                    console.log(devices);
                     setErrors({});
                 })
                 .catch(err => console.log(err));
@@ -144,6 +145,8 @@ export default function OrderForm(props) {
     const openListOfOrders = () => {
         setOrderListVisibility(true);
     }
+
+    console.log(values);
 
     return (
         <>
@@ -212,6 +215,10 @@ export default function OrderForm(props) {
                             }
                         </List>
                     </Grid>
+                    <HiddenField
+                        name='customerName'
+                        value={values.customerName}
+                    />
                 </Grid>
             </Form>
             <Popup
